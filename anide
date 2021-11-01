@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+#
+# Copyright (C) 2021 Vladimir Berlev
+#
+# SPDX-License-Identifier: MIT
+
+import argparse
+import logging
+import os
+import shutil
+import subprocess
+
+
+class AnIde:
+    def __init__(self, args):
+        self.args = args
+        self.docker = AnIde.get_docker()
+        self.dockerfile = AnIde.get_dockerfile()
+
+    @staticmethod
+    def get_dockerfile():
+        if not '__file__' in globals():
+            raise RuntimeError('__file__ is not defined')
+        path = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), 
+            'Dockerfile'
+        )
+        if not os.path.exists(path):
+            raise RuntimeError(f'{path} does not exist')
+        return path
+
+    @staticmethod
+    def get_docker():
+        path = shutil.which('docker')
+        if path is None:
+            raise RuntimeError('docker is not found on the system')
+        return path
+
+    def main(self):
+        logging.debug(self.args)
+        if self.args.command == 'build':
+            self.build()
+        elif self.args.command == 'run':
+            self.run()
+
+    def build(self):
+        subprocess.run(['echo', 'build'])
+
+    def run(self):
+        subprocess.run(['echo', 'run'])
+
+
+def parse_args():
+    p = argparse.ArgumentParser(
+        description='An IDE',
+        epilog='Copyright (C) 2021 Vladimir Berlev, MIT License'
+    )
+    p.add_argument('-v', '--verbose', action='store_true')
+    sp = p.add_subparsers(
+        metavar='COMMAND', 
+        dest='command',
+        required=True 
+    )
+    p_build = sp.add_parser('build', help='build an IDE')
+    p_start = sp.add_parser('run', help='run an IDE')
+    return p.parse_args()
+
+
+def setup_logging(args):
+    level = logging.DEBUG if args.verbose else logging.ERROR
+    logging.basicConfig(level=level, format='%(levelname)-6s: %(message)s')
+
+
+if __name__ == '__main__':
+    args = parse_args()
+    setup_logging(args)
+    try:
+        AnIde(args).main()
+    except Exception as e:
+        logging.error(str(e))
+
