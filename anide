@@ -52,7 +52,17 @@ class AnIde:
             self.run()
 
     def build(self):
-        subprocess.run(['echo', 'build'])
+        cwd = self.build_context
+        cmd = [
+            self.docker, 
+            '--debug=true', 
+            'build', '-t', 'anide', 
+            self.build_context
+        ]
+        logging.info(f'cwd: {cwd}')
+        logging.info(f'cmd: {cmd}')
+        if not self.args.dry_run:
+            subprocess.run(cmd, cwd=cwd)
 
     def run(self):
         subprocess.run(['echo', 'run'])
@@ -64,6 +74,7 @@ def parse_args():
         epilog='Copyright (C) 2021 Vladimir Berlev, MIT License'
     )
     p.add_argument('-v', '--verbose', action='store_true')
+    p.add_argument('--dry-run', action='store_true')
     sp = p.add_subparsers(
         metavar='COMMAND', 
         dest='command',
