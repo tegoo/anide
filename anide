@@ -15,18 +15,26 @@ class AnIde:
     def __init__(self, args):
         self.args = args
         self.docker = AnIde.get_docker()
-        self.dockerfile = AnIde.get_dockerfile()
+        self.build_context = AnIde.get_build_context()
 
     @staticmethod
-    def get_dockerfile():
+    def get_build_context():
         if not '__file__' in globals():
             raise RuntimeError('__file__ is not defined')
+
         path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 
-            'Dockerfile'
+            'image'
         )
         if not os.path.exists(path):
             raise RuntimeError(f'{path} does not exist')
+
+        # sanity check:
+        # Dockerfile should be present in the build context
+        dockerfile = os.path.join(path, 'Dockerfile')
+        if not os.path.exists(dockerfile):
+            raise RuntimeError(f'{dockerfile} does not exist')
+
         return path
 
     @staticmethod
