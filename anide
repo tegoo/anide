@@ -10,6 +10,8 @@ import os
 import shutil
 import subprocess
 
+TARGET_IMAGE = '127.0.0.1:5000/anide'
+
 
 class AnIde:
     def __init__(self, args):
@@ -56,7 +58,7 @@ class AnIde:
         cmd = [
             self.docker, 
             '--debug=true', 
-            'build', '-t', 'anide', 
+            'build', '-t', TARGET_IMAGE,
             self.build_context
         ]
         logging.info(f'cwd: {cwd}')
