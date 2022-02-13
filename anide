@@ -55,6 +55,8 @@ class AnIde:
             self.run()
         elif self.args.command == 'stop':
             self.stop()
+        elif self.args.command == 'attach':
+            self.attach()
 
     def build(self):
         self._run([
@@ -76,6 +78,9 @@ class AnIde:
     def stop(self):
         self._run([self.docker, 'stop', CONTAINER_NAME])
 
+    def attach(self):
+        self._run([self.docker, 'exec', '-it', CONTAINER_NAME, '/bin/bash'])
+
     def _run(self, command):
         workdir = self.build_context
         logging.info(f'workdir: {workdir}')
@@ -95,6 +100,7 @@ def parse_args():
     sp.add_parser('build', help='build an IDE')
     sp.add_parser('run', help='run an IDE')
     sp.add_parser('stop', help='stop an IDE')
+    sp.add_parser('attach', help='attach to an IDE')
     return p.parse_args()
 
 
