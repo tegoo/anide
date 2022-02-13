@@ -11,6 +11,7 @@ import shutil
 import subprocess
 
 TARGET_IMAGE = '127.0.0.1:5000/anide'
+CONTAINER_NAME = 'anide'
 
 
 class AnIde:
@@ -52,6 +53,8 @@ class AnIde:
             self.build()
         elif self.args.command == 'run':
             self.run()
+        elif self.args.command == 'stop':
+            self.stop()
 
     def build(self):
         cwd = self.build_context
@@ -67,7 +70,20 @@ class AnIde:
             subprocess.run(cmd, cwd=cwd)
 
     def run(self):
-        subprocess.run(['echo', 'run'])
+        cwd = self.build_context
+        cmd = [self.docker, 'run', '--name', CONTAINER_NAME, '--detach', '--pull', 'never', '--rm', TARGET_IMAGE]
+        logging.info(f'cwd: {cwd}')
+        logging.info(f'cmd: {cmd}')
+        if not self.args.dry_run:
+            subprocess.run(cmd, cwd=cwd)
+
+    def stop(self):
+        cwd = self.build_context
+        cmd = [self.docker, 'stop', CONTAINER_NAME]
+        logging.info(f'cwd: {cwd}')
+        logging.info(f'cmd: {cmd}')
+        if not self.args.dry_run:
+            subprocess.run(cmd, cwd=cwd)
 
 
 def parse_args():
@@ -84,6 +100,7 @@ def parse_args():
     )
     p_build = sp.add_parser('build', help='build an IDE')
     p_start = sp.add_parser('run', help='run an IDE')
+    p_start = sp.add_parser('stop', help='stop an IDE')
     return p.parse_args()
 
 
