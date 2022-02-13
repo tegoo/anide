@@ -57,33 +57,31 @@ class AnIde:
             self.stop()
 
     def build(self):
-        cwd = self.build_context
-        cmd = [
-            self.docker, 
-            '--debug=true', 
-            'build', '-t', TARGET_IMAGE,
+        self._run([
+            self.docker, 'build', 
+            '-t', TARGET_IMAGE,
             self.build_context
-        ]
-        logging.info(f'cwd: {cwd}')
-        logging.info(f'cmd: {cmd}')
-        if not self.args.dry_run:
-            subprocess.run(cmd, cwd=cwd)
+        ])
 
     def run(self):
-        cwd = self.build_context
-        cmd = [self.docker, 'run', '--name', CONTAINER_NAME, '--detach', '--pull', 'never', '--rm', TARGET_IMAGE]
-        logging.info(f'cwd: {cwd}')
-        logging.info(f'cmd: {cmd}')
-        if not self.args.dry_run:
-            subprocess.run(cmd, cwd=cwd)
+        self._run([
+            self.docker, 'run', 
+            '--name', CONTAINER_NAME, 
+            '--detach', 
+            '--pull', 'never', 
+            '--rm', 
+            TARGET_IMAGE
+        ])
 
     def stop(self):
-        cwd = self.build_context
-        cmd = [self.docker, 'stop', CONTAINER_NAME]
-        logging.info(f'cwd: {cwd}')
-        logging.info(f'cmd: {cmd}')
+        self._run([self.docker, 'stop', CONTAINER_NAME])
+
+    def _run(self, command):
+        workdir = self.build_context
+        logging.info(f'workdir: {workdir}')
+        logging.info(f'command: {command}')
         if not self.args.dry_run:
-            subprocess.run(cmd, cwd=cwd)
+            subprocess.run(command, cwd=workdir)
 
 
 def parse_args():
