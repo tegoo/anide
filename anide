@@ -91,14 +91,10 @@ def parse_args():
     )
     p.add_argument('-v', '--verbose', action='store_true')
     p.add_argument('--dry-run', action='store_true')
-    sp = p.add_subparsers(
-        metavar='COMMAND', 
-        dest='command',
-        required=True 
-    )
-    p_build = sp.add_parser('build', help='build an IDE')
-    p_start = sp.add_parser('run', help='run an IDE')
-    p_start = sp.add_parser('stop', help='stop an IDE')
+    sp = p.add_subparsers(metavar='COMMAND', dest='command', required=True)
+    sp.add_parser('build', help='build an IDE')
+    sp.add_parser('run', help='run an IDE')
+    sp.add_parser('stop', help='stop an IDE')
     return p.parse_args()
 
 
