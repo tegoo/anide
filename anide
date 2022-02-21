@@ -79,7 +79,10 @@ class AnIde:
         self._run([self.docker, 'stop', CONTAINER_NAME])
 
     def attach(self):
-        self._run([self.docker, 'exec', '-it', CONTAINER_NAME, '/bin/bash'])
+        self._run([
+            self.docker, 'exec', '-it', CONTAINER_NAME,
+            '/usr/bin/tmux', 'new-session', '-A', '-s', 'main'
+        ])
 
     def _run(self, command):
         workdir = self.build_context
