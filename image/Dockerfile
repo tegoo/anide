@@ -8,7 +8,7 @@ RUN apt-get -y update && \
 RUN apt-get -y install \
         less tmux python3
 
-RUN useradd -m developer
+RUN useradd -m developer --shell /bin/bash
 USER developer
 
 COPY entrypoint.py /home/developer/
