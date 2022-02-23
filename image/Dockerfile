@@ -10,6 +10,7 @@ RUN apt-get -y install \
 
 RUN useradd -m developer --shell /bin/bash
 USER developer
+WORKDIR /home/developer
 
 COPY entrypoint.py /home/developer/
 ENTRYPOINT ["/usr/bin/python3", "/home/developer/entrypoint.py"]
