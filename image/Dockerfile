@@ -6,6 +6,7 @@ RUN apt-get -y update && \
     apt-get -y install man apt-utils bash-completion
 
 RUN apt-get -y install \
+        ca-certificates \
         less tmux python3
 
 RUN useradd -m developer --shell /bin/bash
