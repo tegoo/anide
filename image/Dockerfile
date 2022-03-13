@@ -7,7 +7,12 @@ RUN apt-get -y update && \
 
 RUN apt-get -y install \
         ca-certificates curl \
+        locales \
         less tmux python3
+
+RUN sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen && locale-gen
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 
 RUN useradd -m developer --shell /bin/bash
 USER developer
@@ -26,4 +31,9 @@ RUN mkdir -p ~/downloads && cd ~/downloads && \
 
 COPY entrypoint.py /home/developer/
 ENTRYPOINT ["/usr/bin/python3", "/home/developer/entrypoint.py"]
+
+COPY --chown=developer:developer config/nvim/init.vim /home/developer/.config/nvim/init.vim
+COPY --chown=developer:developer config/tmux.conf /home/developer/.tmux.conf
+
+ENV TERM=tmux-256color
 
