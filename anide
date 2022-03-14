@@ -57,6 +57,8 @@ class AnIde:
             self.stop()
         elif self.args.command == 'attach':
             self.attach()
+        else:
+            raise RuntimeError('no command provided')
 
     def build(self):
         self._run([
@@ -99,7 +101,7 @@ def parse_args():
     )
     p.add_argument('-v', '--verbose', action='store_true')
     p.add_argument('--dry-run', action='store_true')
-    sp = p.add_subparsers(metavar='COMMAND', dest='command', required=True)
+    sp = p.add_subparsers(metavar='COMMAND', dest='command')
     sp.add_parser('build', help='build an IDE')
     sp.add_parser('run', help='run an IDE')
     sp.add_parser('stop', help='stop an IDE')
