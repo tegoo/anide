@@ -35,6 +35,15 @@ RUN mkdir -p ~/downloads && cd ~/downloads && \
     mkdir -p ~/bin && cp nvim ~/bin/ && \
     chmod u+x ~/bin/nvim
 
+ARG PLUG_URL="https://raw.githubusercontent.com/junegunn/vim-plug/0.11.0/plug.vim"
+ARG PLUG_SUM="0d4dc422c3151ff651063b251933b3465714c5b9f3226faf0ca7f8b4a440a552  plug.vim"
+RUN mkdir -p ~/downloads && cd ~/downloads && \
+    echo "$PLUG_SUM" > plug.vim.sha256sum && \
+    curl -L -o plug.vim "$PLUG_URL" && \
+    sha256sum -c plug.vim.sha256sum && \
+    mkdir -p ~/.local/share/nvim/site/autoload && \
+    cp plug.vim ~/.local/share/nvim/site/autoload/
+
 COPY entrypoint.py /home/developer/
 ENTRYPOINT ["/usr/bin/python3", "/home/developer/entrypoint.py"]
 

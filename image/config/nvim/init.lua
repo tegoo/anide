@@ -6,3 +6,8 @@ vim.opt.list = true
 vim.cmd([[
   colorscheme morning
 ]])
+
+vim.cmd([[
+  call plug#begin()
+  call plug#end()
+]])
