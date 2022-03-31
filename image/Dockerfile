@@ -47,8 +47,10 @@ RUN mkdir -p ~/downloads && cd ~/downloads && \
 COPY entrypoint.py /home/developer/
 ENTRYPOINT ["/usr/bin/python3", "/home/developer/entrypoint.py"]
 
-COPY --chown=developer:developer config/nvim/init.lua /home/developer/.config/nvim/init.lua
-COPY --chown=developer:developer config/tmux.conf /home/developer/.tmux.conf
+COPY --chown=developer:developer config/ /home/developer/.config/
+COPY --chown=developer:developer tmux.conf /home/developer/.tmux.conf
 
 ENV TERM=tmux-256color
+
+RUN ~/bin/nvim -Es -c PlugInstall -c qall -u .config/nvim/lua/plugins.lua
 
