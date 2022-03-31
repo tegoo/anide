@@ -52,8 +52,11 @@ RUN mkdir -p ~/downloads && cd ~/downloads && \
     sha256sum -c node.tar.xz.sha256sum
 USER root
 RUN mkdir -p /usr/local/lib/nodejs && \
-    tar -xJvf /home/developer/downloads/node.tar.xz -C /usr/local/lib/nodejs/ && \
-    echo 'export PATH=$PATH:/usr/local/lib/nodejs/node-v16.14.2-linux-x64/bin' > /etc/profile.d/nodejs.sh
+    tar -xJvf /home/developer/downloads/node.tar.xz -C /usr/local/lib/nodejs/
+ENV PATH="/usr/local/lib/nodejs/node-v16.14.2-linux-x64/bin:${PATH}"
+RUN cd $(mktemp -d) && \
+    npm install -g npm && \
+    npm install -g pyright
 USER developer
 
 COPY entrypoint.py /home/developer/
