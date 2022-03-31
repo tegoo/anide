@@ -44,6 +44,18 @@ RUN mkdir -p ~/downloads && cd ~/downloads && \
     mkdir -p ~/.local/share/nvim/site/autoload && \
     cp plug.vim ~/.local/share/nvim/site/autoload/
 
+ARG NODE_URL="https://nodejs.org/dist/v16.14.2/node-v16.14.2-linux-x64.tar.xz"
+ARG NODE_SUM="e40c6f81bfd078976d85296b5e657be19e06862497741ad82902d0704b34bb1b  node.tar.xz"
+RUN mkdir -p ~/downloads && cd ~/downloads && \
+    echo "$NODE_SUM" > node.tar.xz.sha256sum && \
+    curl -L -o node.tar.xz "$NODE_URL" && \
+    sha256sum -c node.tar.xz.sha256sum
+USER root
+RUN mkdir -p /usr/local/lib/nodejs && \
+    tar -xJvf /home/developer/downloads/node.tar.xz -C /usr/local/lib/nodejs/ && \
+    echo 'export PATH=$PATH:/usr/local/lib/nodejs/node-v16.14.2-linux-x64/bin' > /etc/profile.d/nodejs.sh
+USER developer
+
 COPY entrypoint.py /home/developer/
 ENTRYPOINT ["/usr/bin/python3", "/home/developer/entrypoint.py"]
 
