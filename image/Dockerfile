@@ -67,5 +67,5 @@ COPY --chown=developer:developer tmux.conf /home/developer/.tmux.conf
 
 ENV TERM=tmux-256color
 
-RUN ~/bin/nvim -Es -c PlugInstall -c qall -u .config/nvim/lua/plugins.lua
+RUN ~/bin/nvim -Es -c PlugInstall -c qall -u .config/nvim/lua/anide/plugins.lua
 

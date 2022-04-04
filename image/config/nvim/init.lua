@@ -1,3 +1,3 @@
-require("plugins")
-require("options")
+require("anide.plugins")
+require("anide.options")
 require("anide.lsp")
