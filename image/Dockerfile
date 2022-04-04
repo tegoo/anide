@@ -55,7 +55,7 @@ RUN mkdir -p /usr/local/lib/nodejs && \
     tar -xJvf /home/developer/downloads/node.tar.xz -C /usr/local/lib/nodejs/
 ENV PATH="/usr/local/lib/nodejs/node-v16.14.2-linux-x64/bin:${PATH}"
 RUN cd $(mktemp -d) && \
-    npm install -g npm && \
+    npm update -g && \
     npm install -g pyright
 USER developer
 
