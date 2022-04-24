@@ -19,6 +19,8 @@ class AnIde:
         self.args = args
         self.docker = AnIde.get_docker()
         self.build_context = AnIde.get_build_context()
+        self.group_id = os.getgid()
+        self.user_id = os.getuid()
 
     @staticmethod
     def get_build_context():
@@ -63,13 +65,25 @@ class AnIde:
     def build(self):
         self._run([
             self.docker, 'build', 
+            '--build-arg', f'USER_ID={self.user_id}',
+            '--build-arg', f'GROUP_ID={self.group_id}',
             '-t', TARGET_IMAGE,
             self.build_context
         ])
 
     def run(self):
+        def _volume(host, guest):
+            if host is None:
+                return ()
+            else:
+                return ('--volume', f'{host}:{guest}')
+
+        ws = Workspace(self.args.path)
         self._run([
             self.docker, 'run', 
+            *_volume(ws.get_dev(), '/home/developer/dev'),
+            *_volume(ws.get_gitconfig(), '/home/developer/.gitconfig'),
+            *_volume(ws.get_ssh_auth_sock(), '/home/developer/.ssh-auth-sock'),
             '--name', CONTAINER_NAME, 
             '--detach', 
             '--pull', 'never', 
@@ -94,6 +108,41 @@ class AnIde:
             subprocess.run(command, cwd=workdir)
 
 
+class Workspace:
+    def __init__(self, path):
+        if path is None:
+            raise RuntimeError('path is not provided')
+
+        path = os.path.normpath(path)
+        if not os.path.isabs(path):
+            raise RuntimeError('not an absolute path')
+
+        self._path = path
+        self._dev = os.path.join(path, 'dev')
+        self._magic = os.path.join(path, 'anide-magic')
+        self._gitconfig = os.path.join(path, 'gitconfig')
+        self._ssh_auth_sock = os.path.join(path, 'ssh-auth-sock')
+
+        if not os.path.exists(self._path):
+            os.mkdir(self._path)
+            os.mkdir(self._dev)
+            open(self._magic, 'x').close()
+
+        if not os.path.exists(self._magic):
+            raise RuntimeError('not an IDE path')
+
+    def get_dev(self):
+        return self._dev
+
+    def get_gitconfig(self):
+        r = self._gitconfig
+        return r if os.path.exists(r) else None
+
+    def get_ssh_auth_sock(self):
+        r = self._ssh_auth_sock
+        return r if os.path.exists(r) else None
+
+
 def parse_args():
     p = argparse.ArgumentParser(
         description='An IDE',
@@ -103,7 +152,8 @@ def parse_args():
     p.add_argument('--dry-run', action='store_true')
     sp = p.add_subparsers(metavar='COMMAND', dest='command')
     sp.add_parser('build', help='build an IDE')
-    sp.add_parser('run', help='run an IDE')
+    sp_run = sp.add_parser('run', help='run an IDE')
+    sp_run.add_argument('path', metavar='PATH', help='path to an IDE data')
     sp.add_parser('stop', help='stop an IDE')
     sp.add_parser('attach', help='attach to an IDE')
     return p.parse_args()

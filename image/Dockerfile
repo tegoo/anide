@@ -1,5 +1,10 @@
 FROM ubuntu:20.04
 
+ARG USER_ID
+RUN test -n "$USER_ID"
+ARG GROUP_ID
+RUN test -n "$GROUP_ID"
+
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Berlin
 
@@ -20,7 +25,8 @@ RUN sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen && locale-gen
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
-RUN useradd -m developer --shell /bin/bash
+RUN groupadd -g $GROUP_ID developer && \
+    useradd -u $USER_ID -g $GROUP_ID -m developer --shell /bin/bash
 USER developer
 WORKDIR /home/developer
 
@@ -69,3 +75,4 @@ ENV TERM=tmux-256color
 
 RUN ~/bin/nvim -Es -c PlugInstall -c qall -u .config/nvim/lua/anide/plugins.lua
 
+ENV SSH_AUTH_SOCK=/home/developer/.ssh-auth-sock
